@@ -70,7 +70,7 @@ func (h *QuoteHandler) GetQuotes(w http.ResponseWriter, r *http.Request) {
 	if quotes == nil {
 		quotes = []*entity.Quote{}
 	}
-
+	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(quotes)
 }
@@ -96,7 +96,7 @@ func (h *QuoteHandler) DeleteQuote(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+
 		http.Error(w, "Invalid quote ID", http.StatusBadRequest)
 		return
 	}
@@ -104,10 +104,10 @@ func (h *QuoteHandler) DeleteQuote(w http.ResponseWriter, r *http.Request) {
 	err = h.service.DeleteQuote(id)
 	if err != nil {
 		if err == service.ErrQuoteNotFound {
-			w.WriteHeader(http.StatusNotFound)
+
 			http.Error(w, "Quote not found", http.StatusNotFound)
 		} else {
-			w.WriteHeader(http.StatusInternalServerError)
+
 			http.Error(w, "Failed to delete quote", http.StatusInternalServerError)
 		}
 		return

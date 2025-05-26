@@ -4,10 +4,12 @@ import (
 	"log"
 	"os"
 	"quotesAPI/internal/app"
+	"quotesAPI/internal/config"
 )
 
 func main() {
-	app := app.NewApplication()
+	cfg := config.LoadConfig()
+	app := app.NewApplication(cfg.Port)
 
 	if err := app.Run(); err != nil {
 		log.Printf("Error: %v", err)

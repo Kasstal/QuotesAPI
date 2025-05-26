@@ -1,6 +1,7 @@
 package app
 
 import (
+	"fmt"
 	"quotesAPI/internal/domain/quote/repository"
 	"quotesAPI/internal/domain/quote/service"
 	"quotesAPI/storage"
@@ -8,9 +9,10 @@ import (
 
 type Application struct {
 	QuoteService service.QuoteService
+	Port         string
 }
 
-func NewApplication() *Application {
+func NewApplication(port string) *Application {
 	// Initialize storage
 	storage := storage.NewQuotesStorage()
 
@@ -21,6 +23,7 @@ func NewApplication() *Application {
 	quoteService := service.NewQuoteService(repo)
 
 	return &Application{
+		Port:         fmt.Sprintf(":%s", port),
 		QuoteService: quoteService,
 	}
 }

@@ -17,7 +17,7 @@ func (a *Application) Run() error {
 	delivery.SetupRoutes(router, a.QuoteService)
 
 	server := &http.Server{
-		Addr:    ":8080",
+		Addr:    a.Port,
 		Handler: router,
 		// Add timeouts to avoid resource leaks
 		ReadTimeout:  5 * time.Second,
