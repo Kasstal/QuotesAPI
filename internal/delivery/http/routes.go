@@ -7,7 +7,7 @@ import (
 
 func SetupRoutes(router *mux.Router, quoteService service.QuoteService) {
 	handler := NewQuoteHandler(quoteService)
-
+	router.Use(LoggingMiddleware)
 	router.HandleFunc("/quotes", handler.CreateQuote).Methods("POST")
 	router.HandleFunc("/quotes", handler.GetQuotes).Methods("GET")
 	router.HandleFunc("/quotes/random", handler.GetRandomQuote).Methods("GET")

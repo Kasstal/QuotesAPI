@@ -39,7 +39,10 @@ func (q *QuotesStorage) Len() (int, error) {
 }
 
 func (q *QuotesStorage) Create(params CreateQuoteParams) (*models.Quote, error) {
-	var quote models.Quote
+	quote := models.Quote{
+		Author: params.Author,
+		Quote:  params.Quote,
+	}
 	q.mu.Lock()
 	defer q.mu.Unlock()
 	quote.ID = q.nextID

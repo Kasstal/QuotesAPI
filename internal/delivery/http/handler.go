@@ -3,6 +3,7 @@ package http
 import (
 	"encoding/json"
 	"github.com/gorilla/mux"
+	"log"
 	"net/http"
 	"quotesAPI/internal/domain/quote/entity"
 	"quotesAPI/internal/domain/quote/service"
@@ -25,16 +26,19 @@ type createQuoteRequest struct {
 func (h *QuoteHandler) CreateQuote(w http.ResponseWriter, r *http.Request) {
 	var req createQuoteRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
-
+	log.Println(req.Author, req.Quote)
 	quote, err := h.service.CreateQuote(req.Author, req.Quote)
 	if err != nil {
 		switch err {
 		case service.ErrAuthorRequired, service.ErrTextRequired, service.ErrTextTooLong:
+			w.WriteHeader(http.StatusBadRequest)
 			http.Error(w, err.Error(), http.StatusBadRequest)
 		default:
+			w.WriteHeader(http.StatusInternalServerError)
 			http.Error(w, "Failed to create quote", http.StatusInternalServerError)
 		}
 		return
@@ -58,6 +62,7 @@ func (h *QuoteHandler) GetQuotes(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
 		http.Error(w, "Failed to get quotes", http.StatusInternalServerError)
 		return
 	}
@@ -74,8 +79,10 @@ func (h *QuoteHandler) GetRandomQuote(w http.ResponseWriter, r *http.Request) {
 	quote, err := h.service.GetRandomQuote()
 	if err != nil {
 		if err == service.ErrQuoteNotFound {
+			w.WriteHeader(http.StatusNotFound)
 			http.Error(w, "No quotes available", http.StatusNotFound)
 		} else {
+			w.WriteHeader(http.StatusInternalServerError)
 			http.Error(w, "Failed to get random quote", http.StatusInternalServerError)
 		}
 		return
@@ -89,6 +96,7 @@ func (h *QuoteHandler) DeleteQuote(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
 		http.Error(w, "Invalid quote ID", http.StatusBadRequest)
 		return
 	}
@@ -96,8 +104,10 @@ func (h *QuoteHandler) DeleteQuote(w http.ResponseWriter, r *http.Request) {
 	err = h.service.DeleteQuote(id)
 	if err != nil {
 		if err == service.ErrQuoteNotFound {
+			w.WriteHeader(http.StatusNotFound)
 			http.Error(w, "Quote not found", http.StatusNotFound)
 		} else {
+			w.WriteHeader(http.StatusInternalServerError)
 			http.Error(w, "Failed to delete quote", http.StatusInternalServerError)
 		}
 		return

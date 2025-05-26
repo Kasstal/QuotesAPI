@@ -1,13 +1,14 @@
 package repository
 
 import (
+	"log"
 	"math/rand"
 	"quotesAPI/internal/domain/quote/entity"
 	"quotesAPI/storage"
 )
 
 type QouteRepository interface {
-	Create(quote entity.Quote) (*entity.Quote, error)
+	Create(author string, text string) (*entity.Quote, error)
 	GetRandom() (*entity.Quote, error)
 	GetAll() ([]*entity.Quote, error)
 	GetByAuthor(string) ([]*entity.Quote, error)
@@ -22,13 +23,15 @@ func NewQuoteRepository(storage *storage.QuotesStorage) QouteRepository {
 	return &quoteRepository{storage: storage}
 }
 
-func (q *quoteRepository) Create(quote entity.Quote) (*entity.Quote, error) {
-	createQuoteParams := storage.CreateQuoteParams{
-		Author: quote.Author,
-		Quote:  quote.Quote,
+func (q *quoteRepository) Create(author string, text string) (*entity.Quote, error) {
+
+	createParams := storage.CreateQuoteParams{
+		Author: author,
+		Quote:  text,
 	}
 
-	quoteModel, err := q.storage.Create(createQuoteParams)
+	quoteModel, err := q.storage.Create(createParams)
+	log.Println(quoteModel)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +49,7 @@ func (q *quoteRepository) GetRandom() (*entity.Quote, error) {
 		return nil, err
 	}
 
-	randID := rand.Intn(l)
+	randID := rand.Intn(l) + 1
 	quoteModel, err := q.storage.GetByID(randID)
 
 	if err != nil {

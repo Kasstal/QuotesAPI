@@ -8,7 +8,6 @@ import (
 
 var (
 	ErrQuoteNotFound  = errors.New("quote not found")
-	ErrInvalidQuote   = errors.New("invalid quote data")
 	ErrAuthorRequired = errors.New("author is required")
 	ErrTextRequired   = errors.New("quote text is required")
 	ErrTextTooLong    = errors.New("quote text is too long")
@@ -31,7 +30,7 @@ func NewQuoteService(repo repository.QouteRepository) QuoteService {
 }
 
 func (s *quoteService) CreateQuote(author, text string) (*entity.Quote, error) {
-	// Input validation
+
 	if author == "" {
 		return nil, ErrAuthorRequired
 	}
@@ -42,12 +41,7 @@ func (s *quoteService) CreateQuote(author, text string) (*entity.Quote, error) {
 		return nil, ErrTextTooLong
 	}
 
-	quote := entity.Quote{
-		Author: author,
-		Quote:  text,
-	}
-
-	return s.repo.Create(quote)
+	return s.repo.Create(author, text)
 }
 
 func (s *quoteService) GetRandomQuote() (*entity.Quote, error) {
