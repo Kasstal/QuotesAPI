@@ -3,7 +3,6 @@ package http
 import (
 	"encoding/json"
 	"github.com/gorilla/mux"
-	"log"
 	"net/http"
 	"quotesAPI/internal/domain/quote/entity"
 	"quotesAPI/internal/domain/quote/service"
@@ -30,7 +29,6 @@ func (h *QuoteHandler) CreateQuote(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
-	log.Println(req.Author, req.Quote)
 	quote, err := h.service.CreateQuote(req.Author, req.Quote)
 	if err != nil {
 		switch err {

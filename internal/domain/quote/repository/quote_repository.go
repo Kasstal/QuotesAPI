@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"log"
 	"math/rand"
 	"quotesAPI/internal/domain/quote/entity"
 	"quotesAPI/storage"
@@ -31,7 +30,7 @@ func (r *quoteRepository) Create(author string, text string) (*entity.Quote, err
 	}
 
 	quoteModel, err := r.storage.Create(createParams)
-	log.Println(quoteModel)
+
 	if err != nil {
 		return nil, err
 	}
