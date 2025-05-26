@@ -14,6 +14,9 @@ import (
 		Delete(int) error
 	}
 */
+
+var ErrQuoteNotFound = errors.New("quote not found")
+
 type QuotesStorage struct {
 	mu     sync.RWMutex
 	quotes map[int]models.Quote
@@ -21,7 +24,7 @@ type QuotesStorage struct {
 }
 
 func NewQuotesStorage() *QuotesStorage {
-	return &QuotesStorage{nextID: 1, quotes: make(map[int]models.Quote)}
+	return &QuotesStorage{nextID: 1, quotes: map[int]models.Quote{}}
 }
 
 type CreateQuoteParams struct {
@@ -32,7 +35,7 @@ type CreateQuoteParams struct {
 func (q *QuotesStorage) Len() (int, error) {
 	l := len(q.quotes)
 	if l == 0 {
-		return 0, errors.New("no quotes found")
+		return 0, ErrQuoteNotFound
 	}
 
 	return l, nil
@@ -55,6 +58,7 @@ func (q *QuotesStorage) Create(params CreateQuoteParams) (*models.Quote, error) 
 func (q *QuotesStorage) GetAll() ([]models.Quote, error) {
 	q.mu.RLock()
 	defer q.mu.RUnlock()
+
 	quotes := make([]models.Quote, 0, len(q.quotes))
 	for _, qoute := range q.quotes {
 		quotes = append(quotes, qoute)
@@ -67,8 +71,9 @@ func (q *QuotesStorage) GetByID(id int) (models.Quote, error) {
 	q.mu.RLock()
 	defer q.mu.RUnlock()
 	quote, ok := q.quotes[id]
+
 	if !ok {
-		return models.Quote{}, errors.New("quote not found")
+		return models.Quote{}, ErrQuoteNotFound
 	}
 	return quote, nil
 }
@@ -92,7 +97,7 @@ func (q *QuotesStorage) Delete(id int) error {
 	defer q.mu.Unlock()
 	_, ok := q.quotes[id]
 	if !ok {
-		return errors.New("quote not found")
+		return ErrQuoteNotFound
 	}
 	delete(q.quotes, id)
 	return nil

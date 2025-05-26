@@ -23,14 +23,14 @@ func NewQuoteRepository(storage *storage.QuotesStorage) QouteRepository {
 	return &quoteRepository{storage: storage}
 }
 
-func (q *quoteRepository) Create(author string, text string) (*entity.Quote, error) {
+func (r *quoteRepository) Create(author string, text string) (*entity.Quote, error) {
 
 	createParams := storage.CreateQuoteParams{
 		Author: author,
 		Quote:  text,
 	}
 
-	quoteModel, err := q.storage.Create(createParams)
+	quoteModel, err := r.storage.Create(createParams)
 	log.Println(quoteModel)
 	if err != nil {
 		return nil, err
@@ -63,12 +63,12 @@ func (q *quoteRepository) GetRandom() (*entity.Quote, error) {
 	}, err
 }
 
-func (q *quoteRepository) GetAll() ([]*entity.Quote, error) {
-	qouteModels, err := q.storage.GetAll()
+func (r *quoteRepository) GetAll() ([]*entity.Quote, error) {
+	qouteModels, err := r.storage.GetAll()
 	if err != nil {
 		return nil, err
 	}
-	quotes := make([]*entity.Quote, len(qouteModels))
+	quotes := make([]*entity.Quote, 0, len(qouteModels))
 
 	for _, quoteModel := range qouteModels {
 		quotes = append(quotes, &entity.Quote{
@@ -81,12 +81,12 @@ func (q *quoteRepository) GetAll() ([]*entity.Quote, error) {
 	return quotes, nil
 }
 
-func (q *quoteRepository) GetByAuthor(author string) ([]*entity.Quote, error) {
-	qouteModels, err := q.storage.GetByAuthor(author)
+func (r *quoteRepository) GetByAuthor(author string) ([]*entity.Quote, error) {
+	qouteModels, err := r.storage.GetByAuthor(author)
 	if err != nil {
 		return nil, err
 	}
-	quotes := make([]*entity.Quote, len(qouteModels))
+	quotes := make([]*entity.Quote, 0, len(qouteModels))
 
 	for _, quoteModel := range qouteModels {
 		quotes = append(quotes, &entity.Quote{
@@ -99,6 +99,6 @@ func (q *quoteRepository) GetByAuthor(author string) ([]*entity.Quote, error) {
 	return quotes, nil
 }
 
-func (q *quoteRepository) Delete(id int) error {
-	return q.storage.Delete(id)
+func (r *quoteRepository) Delete(id int) error {
+	return r.storage.Delete(id)
 }
